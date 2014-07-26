@@ -161,9 +161,9 @@
 
 ;(get [1 2 3] 1)
 
-(defn all-nths [seq-of-seqs index]
+(defn all-nths [seq-of-seqs n]
   (reduce (fn [curr-seq a-seq]
-            (conj curr-seq (get a-seq index)))
+            (conj curr-seq (get a-seq n)))
           []
           seq-of-seqs))
 
