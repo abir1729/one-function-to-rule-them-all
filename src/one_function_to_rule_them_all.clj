@@ -60,15 +60,42 @@
             a-seq)))
 
 ;(my-reverse [1 2 3])
+;(assoc [1 2] 0 3)
 
 (defn min-max-element [a-seq]
-  [:-])
+  (loop [min-elem (first a-seq)
+         max-elem (first a-seq)
+         the-seq a-seq]
+    (if (empty? the-seq)
+      [min-elem max-elem]
+      (let [next-elem (first the-seq)
+            rest-seq (rest the-seq)]
+        (cond
+         (< next-elem min-elem) (recur next-elem max-elem rest-seq)
+         (> next-elem max-elem) (recur min-elem next-elem rest-seq)
+         :else (recur min-elem max-elem rest-seq))))))
+
+;(min-max-element [1 2 3])
 
 (defn insert [sorted-seq n]
-  [:-])
+  (let [helper (fn [curr-seq rest-seq]
+                 (if (empty? rest-seq)
+                   (conj curr-seq n)
+                   (let [next-elem (first rest-seq)]
+                   (if (<= n next-elem)
+                     (concat curr-seq (cons n rest-seq))
+                     (recur (conj curr-seq next-elem) (rest rest-seq))))))]
+    (helper [] sorted-seq)))
+
+;(insert [1 2 3] 5)
+;(insert [] 2)      ;=> (2)
+;(insert [1 3 4] 2) ;=> (1 2 3 4)
+;(insert [1] 2)     ;=> (1 2)
 
 (defn insertion-sort [a-seq]
-  [:-])
+  (reduce insert [] a-seq))
+
+;(insertion-sort [1 2 -1 -0.3])
 
 (defn parity [a-seq]
   [:-])
