@@ -98,19 +98,102 @@
 ;(insertion-sort [1 2 -1 -0.3])
 
 (defn parity [a-seq]
-  [:-])
+  (reduce (fn [a-set an-elem]
+            (if (contains? a-set an-elem)
+              (disj a-set an-elem)
+              (conj a-set an-elem)))
+          #{}
+          a-seq))
 
-(defn minus [x]
-  :-)
+;(disj #{1 2} 1)
+;(conj #{1 2} 3)
+;(contains? #{1 2} 2)
 
-(defn count-params [x]
-  :-)
+;(parity [1 2 3 1 4 4 4])
+;(parity [:a :b :c])    ;=> #{:a :b :c}
+;(parity [:a :a :b :b]) ;=> #{}
+;(parity [1 2 3 1])     ;=> #{2 3}
 
-(defn my-* [x]
-  :-)
+(defn minus
+  ([x] (- 0 x))
+  ([x y] (- x y)))
 
-(defn pred-and [x]
-  (fn [x] :-))
+;(minus 2)   ;=> -2
+;(minus 4 3) ;=> 1
 
-(defn my-map [f a-seq]
-  [:-])
+(defn count-params
+  ([] 0)
+  ([x & more] (inc (count more))))
+
+;(count-params 1 2 3 4)
+;(count-params)            ;=> 0
+;(count-params :a)         ;=> 1
+;(count-params :a 1 :b :c) ;=> 4
+
+;(reduce * [2 3 4])
+
+;(defn truthy [] true)
+;(truthy)
+
+(defn my-*
+  ([] 1)
+  ([x] x)
+  ([x & more] (reduce * x more))
+  )
+
+;(apply or [true false])
+;(not-any? identity [true false])
+
+;(my-* 1 2)
+;(my-*)           ;=> 1
+;(my-* 4 3)       ;=> 12
+;(my-* 1 2 3 4 5) ;=> 120
+(apply vector '(1 2 3))
+
+(defn pred-and
+  ([] (fn [_] true))
+  ([p] (fn [an-elem] (p an-elem)))
+  ([p & predicates]
+   (let [all-predicates (cons p predicates)]
+     (fn [an-elem]
+       (every? identity (map #(% an-elem) all-predicates))))
+   ))
+
+;(get [1 2 3] 1)
+
+(defn all-nths [seq-of-seqs index]
+  (reduce (fn [curr-seq a-seq]
+            (conj curr-seq (get a-seq index)))
+          []
+          seq-of-seqs))
+
+(defn columns [seq-of-seqs]
+  (let [num-cols (count (first seq-of-seqs))
+        indices (range 0 num-cols)]
+    (reduce (fn [curr-seq curr-index]
+              (assoc curr-seq curr-index
+                (apply vector (all-nths seq-of-seqs curr-index))))
+            []
+            indices)
+    ))
+
+;(columns [[1 3] [2 5]])
+
+(defn my-map
+  ([f a-seq] (reduce (fn [curr-seq elem]
+                       (conj curr-seq (f elem)))
+                     []
+                     a-seq))
+  ([f a-seq & more-seqs] (let [all-seqs (cons a-seq more-seqs)
+                               arg-lists (columns all-seqs)]
+                           (reduce (fn [curr-seq arg-list]
+                                     (conj curr-seq (apply f arg-list))) [] arg-lists))))
+
+;(my-map inc [1 2 3 4])                  ;=> (2 3 4 5)
+;(my-map + [1 1 1] [1 1 1] [1 1 1])      ;=> (3 3 3)
+;(my-map vector [1 2 3] [1 2 3] [1 2 3]) ;=> ((1 1 1) (2 2 2) (3 3 3))
+
+;(filter (pred-and) [1 0 -2])                    ;=> (1 0 -2)
+;(filter (pred-and pos? odd?) [1 2 -4 0 6 7 -3]) ;=> (1 7)
+
+
